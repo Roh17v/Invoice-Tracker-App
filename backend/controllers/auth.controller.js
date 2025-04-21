@@ -1,4 +1,6 @@
 import { User } from "../models/user.model.js";
+import { createError } from "../utils/error.js";
+import bcrypt from "bcrypt";
 
 export const signupUser = async (req, res, next) => {
   try {
@@ -31,32 +33,31 @@ export const signupUser = async (req, res, next) => {
   }
 };
 
-
 export const loginUser = async (req, res, next) => {
-    try {
-      const { email, password } = req.body;
-      const user = await User.findOne({ email });
-      if (!user) return next(createError(404, "User Not Found!"));
-  
-      const validPassword = await bcrypt.compare(password, user.password);
-  
-      if (!validPassword)
-        return next(createError(400, "Invalid Email or Password."));
-  
-      //token generation
-      const token = user.generateAuthToken();
-      res.cookie("authToken", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        maxAge: 1000 * 60 * 60 * 24,
-      });
-      return res.status(200).json({
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return next(createError(404, "User Not Found!"));
+
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword)
+      return next(createError(400, "Invalid Email or Password."));
+
+    //token generation
+    const token = user.generateAuthToken();
+    res.cookie("authToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+    return res.status(200).json({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
