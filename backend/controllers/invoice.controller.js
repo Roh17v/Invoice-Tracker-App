@@ -14,11 +14,12 @@ export const createInvoice = async (req, res, next) => {
       dueDate,
       category,
       notes,
-      filePath,
       assignedTo,
     } = req.body;
 
     const userId = req.user._id;
+
+    const filePath = req.file ? req.file.path : null;
 
     const invoice = new Invoice({
       vendorName,
