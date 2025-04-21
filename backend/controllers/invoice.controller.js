@@ -1,5 +1,6 @@
 import { invoiceValidationSchema } from "../models/invoice.model.js";
 import { Invoice } from "../models/invoice.model.js";
+import { createError } from "../utils/error.js";
 
 export const createInvoice = async (req, res, next) => {
   try {
@@ -49,3 +50,53 @@ export const createInvoice = async (req, res, next) => {
     next(err);
   }
 };
+
+export const updateInvoiceStatus = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const { status, note, assignedTo } = req.body;
+  
+      const invoice = await Invoice.findById(id);
+      if (!invoice) return res(createError(404, "Invoice not Found!"));
+  
+      // Only assigned reviewer or admin can update
+      if (
+        req.user.role !== "admin" &&
+        invoice.assignedTo?.toString() !== req.user._id.toString()
+      ) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+  
+      if (status) invoice.status = status;
+      if (assignedTo) invoice.assignedTo = assignedTo;
+  
+      invoice.logs.push({
+        action: status || "Reassigned",
+        user: req.user._id,
+        timestamp: new Date(),
+        note: note || ""
+      });
+  
+      await invoice.save();
+      res.status(200).json({ message: "Invoice updated", invoice });
+    } catch (error) {
+      next(error);
+    }
+};
+
+export const getInvoiceById = async (req, res, next) => {
+    try {
+      const invoice = await Invoice.findById(req.params.id)
+        .populate("createdBy", "name email")
+        .populate("assignedTo", "name email")
+        .populate("logs.user", "name email");
+  
+      if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+  
+      res.status(200).json(invoice);
+    } catch (error) {
+      next(error);
+    }
+};
+  
+  
