@@ -1,9 +1,35 @@
 import express from "express"
 import dotenv from "dotenv"
 import connectDB from "./src/db/index.js";
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth.routes.js";
 
 const app = express();
 dotenv.config();
+
+
+//middlewares
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/api/auth", authRouter);
+app.get("/api/data", (req, res) => res.json({ message: "Secret Data" }));
+
+
+//Error Handler
+app.use((err, req, res, next) => {
+  const errorStatus = err.status || 500;
+  const errorMessage = err.message || "Something Went Wrong!";
+  if (err)
+    return res.status(errorStatus).json({
+      success: false,
+      status: errorStatus,
+      message: errorMessage,
+      stack: err.stack,
+    });
+  next();
+});
+
 
 const startServer = async () => {
     try {
