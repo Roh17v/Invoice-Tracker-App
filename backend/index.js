@@ -1,12 +1,12 @@
-import express from "express"
-import dotenv from "dotenv"
+import express from "express";
+import dotenv from "dotenv";
 import connectDB from "./src/db/index.js";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
+import invoiceRouter from "./routes/invoice.routes.js";
 
 const app = express();
 dotenv.config();
-
 
 //middlewares
 app.use(cookieParser());
@@ -15,7 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
 app.use("/api/invoices", invoiceRouter);
 app.get("/api/check-health", (req, res) => res.send("ok"));
-
 
 //Error Handler
 app.use((err, req, res, next) => {
@@ -31,18 +30,16 @@ app.use((err, req, res, next) => {
   next();
 });
 
-
 const startServer = async () => {
-    try {
-      await connectDB();
-      app.listen(process.env.PORT || 5000, () => {
-        console.log(`Server running on port ${process.env.PORT}`);
-      });
-    } catch (err) {
-      console.error("Error during server startup:", err);
-      process.exit(1);
-    }
-  };
-  
-  startServer();
-  
+  try {
+    await connectDB();
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`Server running on port ${process.env.PORT}`);
+    });
+  } catch (err) {
+    console.error("Error during server startup:", err);
+    process.exit(1);
+  }
+};
+
+startServer();
