@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
-app.get("/api/data", (req, res) => res.json({ message: "Secret Data" }));
+app.get("/api/check-health", (req, res) => res.send("ok"));
 
 
 //Error Handler

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { genSalt, hash } from "bcrypt";
+import Joi from "joi";
 
 
 const userSchema = new mongoose.Schema(
@@ -24,8 +25,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["Admin", "Reviewer"],
-      default: "Reviewer",
+      enum: ["admin", "reviewer"],
+      default: "reviewer",
     },
   },
   { timestamps: true }
@@ -47,4 +48,5 @@ userSchema.methods.generateAuthToken = function () {
   return token;
 };
 
-export const UserSchema = mongoose.model("User", userSchema);
+
+export const User = mongoose.model("User", userSchema);
