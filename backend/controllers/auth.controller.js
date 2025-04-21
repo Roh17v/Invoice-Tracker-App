@@ -1,9 +1,15 @@
 import { User } from "../models/user.model.js";
 import { createError } from "../utils/error.js";
 import bcrypt from "bcrypt";
+import { userValidationSchema } from "../models/user.model.js";
 
 export const signupUser = async (req, res, next) => {
   try {
+    const { error } = userValidationSchema.validate(req.body);
+    if (error) {
+      return next(createError(400, error.details[0].message));
+    }
+
     const { email, password, role = "reviewer", name } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -24,6 +30,7 @@ export const signupUser = async (req, res, next) => {
     });
 
     return res.status(201).json({
+      id: result._id,
       name: result.name,
       email: result.email,
       role: result.role,
@@ -53,6 +60,7 @@ export const loginUser = async (req, res, next) => {
       maxAge: 1000 * 60 * 60 * 24,
     });
     return res.status(200).json({
+      id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,

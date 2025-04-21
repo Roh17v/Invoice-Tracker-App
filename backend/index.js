@@ -13,6 +13,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
+app.use("/api/invoices", invoiceRouter);
 app.get("/api/check-health", (req, res) => res.send("ok"));
 
 
