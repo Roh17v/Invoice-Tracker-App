@@ -4,6 +4,7 @@ import connectDB from "./src/db/index.js";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
 import invoiceRouter from "./routes/invoice.routes.js";
+import adminRouter from "./routes/admin.routes.js";
 
 const app = express();
 dotenv.config();
@@ -13,6 +14,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
+app.use("/api/admin", adminRouter);
 app.use("/api/invoices", invoiceRouter);
 app.get("/api/check-health", (req, res) => res.send("ok"));
 

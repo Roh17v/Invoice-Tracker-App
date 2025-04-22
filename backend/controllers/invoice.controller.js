@@ -33,7 +33,7 @@ export const createInvoice = async (req, res, next) => {
       assignedTo: assignedTo || userId,
       logs: [
         {
-          action: "Submitted",
+          action: "submitted",
           user: userId,
           note: "Invoice submitted.",
         },
@@ -57,7 +57,7 @@ export const updateInvoiceStatus = async (req, res, next) => {
       const { status, note, assignedTo } = req.body;
   
       const invoice = await Invoice.findById(id);
-      if (!invoice) return res(createError(404, "Invoice not Found!"));
+      if (!invoice) return next(createError(404, "Invoice not Found!"));
   
       // Only assigned reviewer or admin can update
       if (
@@ -71,7 +71,7 @@ export const updateInvoiceStatus = async (req, res, next) => {
       if (assignedTo) invoice.assignedTo = assignedTo;
   
       invoice.logs.push({
-        action: status || "Reassigned",
+        action: status || "reassigned",
         user: req.user._id,
         timestamp: new Date(),
         note: note || ""

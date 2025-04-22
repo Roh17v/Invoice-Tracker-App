@@ -86,10 +86,11 @@ export const invoiceValidationSchema = Joi.object({
 
   category: Joi.string()
     .valid(
-      "Utilities", "Software", "Office Supplies", "Travel", "Consulting",
-      "Marketing", "Maintenance", "Training", "Legal", "Subscription",
-      "Insurance", "IT Services", "Logistics", "HR Services", "Miscellaneous"
+      "utilities", "software", "office supplies", "travel", "consulting",
+      "marketing", "maintenance", "training", "legal", "subscription",
+      "insurance", "it services", "logistics", "hr services", "miscellaneous"
     )
+    .lowercase()
     .required()
     .messages({
       "any.only": "Category is not valid",
@@ -100,8 +101,10 @@ export const invoiceValidationSchema = Joi.object({
 
   filePath: Joi.string().allow("").optional(),
 
-  assignedTo: objectId.allow(null).optional(),
-
+  assignedTo: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .allow(null)
+    .optional(),
 });
 
 export const Invoice = mongoose.model("Invoice", invoiceSchema);
