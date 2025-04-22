@@ -90,6 +90,7 @@ export const sendUser = async (req, res, next) => {
     const userInfo = await User.findById(req.user._id);
     return res.status(200).json({
       id: userInfo._id,
+      name: userInfo.name,
       email: userInfo.email,
       role: userInfo.role,
     });
