@@ -12,22 +12,11 @@ const invoiceSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        "Utilities",
-        "Software",
-        "Office Supplies",
-        "Travel",
-        "Consulting",
-        "Marketing",
-        "Maintenance",
-        "Training",
-        "Legal",
-        "Subscription",
-        "Insurance",
-        "IT Services",
-        "Logistics",
-        "HR Services",
-        "Miscellaneous",
-      ],
+        "utilities", "software", "office supplies", "travel", "consulting", 
+        "marketing", "maintenance", "training", "legal", "subscription", 
+        "insurance", "it services", "logistics", "hr services", "miscellaneous"
+      ]
+      ,
       required: true,
     },
     notes: String,
@@ -35,8 +24,8 @@ const invoiceSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Pending", "Approved", "Rejected", "Paid"],
-      default: "Pending",
+      enum: ["pending", "approved", "rejected", "paid"],
+      default: "pending",
     },
 
     assignedTo: {
@@ -55,7 +44,7 @@ const invoiceSchema = new mongoose.Schema(
       {
         action: {
           type: String,
-          enum: ["Submitted", "Approved", "Rejected", "Reassigned"],
+          enum: ["submitted", "approved", "rejected", "reassigned"],
         },
         user: {
           type: mongoose.Schema.Types.ObjectId,
