@@ -67,7 +67,7 @@ export const UserProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const response = await axios.post(`${HOST}/${LOGOUT_ROUTE}`, {
+      const response = await axios.post(`${HOST}${LOGOUT_ROUTE}`, {
         withCredentials: "true",
       });
 

@@ -8,6 +8,9 @@ import {
 import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
 import { useUser } from "../context/UserContext";
+import axios from "axios";
+import { formatDistanceToNow } from "date-fns";
+import { HOST, RECENT_ACTIVITY_ROUTE } from "../utils/constants";
 
 const StatusTile = ({ status, count, icon, bgColor, textColor }) => (
   <div
@@ -31,12 +34,29 @@ const HomePage = () => {
     paid: 10,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [recentActivity, setRecentActivity] = useState([
-    "Invoice #1023 was approved 2 hours ago",
-    "Invoice #1005 was paid yesterday",
-    "Invoice #1010 was rejected due to incorrect details",
-  ]);
+  const [activities, setActivities] = useState([]);
+  const [isLoadingActivities, setIsLoadingActivities] = useState(true);
+  const [activityError, setActivityError] = useState("");
 
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const response = await axios.get(`${HOST}${RECENT_ACTIVITY_ROUTE}`, {
+          withCredentials: "true",
+        });
+        setActivities(response.data);
+      } catch (err) {
+        console.error(
+          "Error fetching activities:",
+          err.response?.data || err.message
+        );
+        setActivityError("Failed to load recent activity");
+      } finally {
+        setIsLoadingActivities(false);
+      }
+    };
+    fetchActivities();
+  }, []);
 
   const statusTiles = [
     {
@@ -98,11 +118,24 @@ const HomePage = () => {
               Recent Activity
             </h2>
             <ul className="bg-white rounded-lg shadow-md p-4 space-y-3">
-              {recentActivity.map((activity, idx) => (
-                <li key={idx} className="text-gray-700">
-                  {activity}
-                </li>
-              ))}
+              {isLoadingActivities ? (
+                <li className="text-gray-700">Loading activities...</li>
+              ) : activityError ? (
+                <li className="text-red-500">{activityError}</li>
+              ) : activities.length === 0 ? (
+                <li className="text-gray-700">No recent activity found.</li>
+              ) : (
+                activities.map((activity, idx) => (
+                  <li key={idx} className="text-gray-700">
+                    {activity.userName} {activity.action} invoice "
+                    {activity.vendorName}" ${activity.amount}{" "}
+                    {formatDistanceToNow(new Date(activity.timestamp), {
+                      addSuffix: true,
+                    })}
+                    {activity.note && ` (Note: ${activity.note})`}
+                  </li>
+                ))
+              )}
             </ul>
           </div>
         </div>

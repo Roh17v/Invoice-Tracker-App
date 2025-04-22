@@ -143,6 +143,45 @@ export const getAllInvoicesForUser = async (req, res, next) => {
   }
 };
 
+// GET /api/invoices/recent-activity
+export const getRecentActivity = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const invoices = await Invoice.find({
+      $or: [{ createdBy: userId }, { assignedTo: userId }],
+    })
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate("logs.user", "name email") 
+      .lean(); 
+
+    const activities = invoices
+      .flatMap((invoice) =>
+        invoice.logs.map((log) => ({
+          action: log.action,
+          invoiceId: invoice._id,
+          vendorName: invoice.vendorName,
+          amount: invoice.amount,
+          status: invoice.status,
+          timestamp: log.timestamp,
+          userName: log.user?.name || "Unknown",
+          userEmail: log.user?.email || "Unknown",
+          note: log.note || "",
+          createdBy: invoice.createdBy?.name || "Unknown",
+          assignedTo: invoice.assignedTo?.name || "Unknown",
+        }))
+      )
+      .sort((a, b) => b.timestamp - a.timestamp) // Sort by timestamp (newest first)
+      .slice(0, 10); // Limit to 10 most recent activities
+
+    res.status(200).json(activities);
+  } catch (error) {
+    console.error("Error fetching recent activity:", error);
+    res.status(500).json({ message: "Server error while fetching activity." });
+  }
+};
+
 
 
   

@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"; // For navigation (use # if not using react-router)
+import { useUser } from "../context/UserContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { logout } = useUser();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
   const handleLogout = () => {
-    // Replace with your logout logic (e.g., clear auth token, redirect)
-    console.log("User logged out");
+    logout();
   };
 
   return (
