@@ -1,7 +1,13 @@
 import axios from "axios";
 import { createContext, useContext, useState, useEffect } from "react";
-import { HOST, LOGIN_ROUTE, LOGOUT_ROUTE } from "../utils/constants";
+import {
+  AUTH_ROUTES,
+  HOST,
+  LOGIN_ROUTE,
+  LOGOUT_ROUTE,
+} from "../utils/constants";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const UserContext = createContext();
 
@@ -9,6 +15,35 @@ export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`${HOST}${AUTH_ROUTES}/me`, {
+          withCredentials: true,
+        });
+
+        if (response.status === 200 && response.data) {
+          setUser(response.data);
+          navigate("/");
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.log("Error checking user!", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+        console.log(user);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const login = async (userData, navigate) => {
     console.log("Inside login");
@@ -48,7 +83,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </UserContext.Provider>
   );

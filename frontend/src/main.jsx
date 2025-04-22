@@ -4,12 +4,15 @@ import "./index.css";
 import App from "./App.jsx";
 import { StrictMode } from "react";
 import { Toaster } from "sonner";
+import { UserProvider } from "./context/UserContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
-      <Toaster position="top-right" richColors />
+      <UserProvider>
+        <App />
+        <Toaster position="top-right" richColors />
+      </UserProvider>
     </BrowserRouter>
   </StrictMode>
 );
