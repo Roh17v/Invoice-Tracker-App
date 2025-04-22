@@ -98,5 +98,46 @@ export const getInvoiceById = async (req, res, next) => {
       next(error);
     }
 };
+
+export const getInvoicesByUser = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+
+    const invoices = await Invoice.find({
+      $or: [{ createdBy: userId }, { assignedTo: userId }]
+    });
+
+    res.status(200).json(invoices);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//get invoices with filters
+export const getAllInvoices = async (req, res, next) => {
+  try {
+    const { status, vendor, category, fromDate, toDate } = req.query;
+    const filter = {};
+
+    if (status) filter.status = status;
+    if (vendor) filter.vendorName = new RegExp(vendor, "i");
+    if (category) filter.category = category;
+    if (fromDate || toDate) {
+      filter.dueDate = {};
+      if (fromDate) filter.dueDate.$gte = new Date(fromDate);
+      if (toDate) filter.dueDate.$lte = new Date(toDate);
+    }
+
+    const invoices = await Invoice.find(filter)
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email");
+
+    res.status(200).json(invoices);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
   
   
