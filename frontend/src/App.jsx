@@ -2,15 +2,20 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./pages/LoginPage";
 import { Toaster } from "sonner";
+import Home from "./pages/Home";
+import { UserProvider } from "./context/UserContext";
 
 function App() {
   return (
     <>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
+      <UserProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<Home />} />
+        </Routes>
 
-      <Toaster position="top-right" richColors />
+        
+      </UserProvider>
     </>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -8,13 +10,18 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  const { login } = useUser();
+
+  const handleSignIn = (e) => {
     e.preventDefault();
 
-    if (!email) {
-      return toast.error("Enter your email!");
-    }
-    console.log("Login submitted:", { email, password });
+    let userData = {};
+    if (email) userData.email = email;
+    if (password) userData.password = password;
+
+    login(userData, navigate);
   };
 
   return (
@@ -43,7 +50,7 @@ const LoginPage = () => {
             Access your invoice dashboard
           </p>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSignIn} className="space-y-6">
             <div>
               <label
                 htmlFor="email"
