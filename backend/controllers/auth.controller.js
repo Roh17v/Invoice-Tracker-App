@@ -70,7 +70,6 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
-
 export const logout = async (req, res, next) => {
   try {
     res.cookie("authToken", "", {
@@ -81,6 +80,19 @@ export const logout = async (req, res, next) => {
     });
 
     return res.status(200).send("Logout Successfull.");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendUser = async (req, res, next) => {
+  try {
+    const userInfo = await User.findById(req.user._id);
+    return res.status(200).json({
+      id: userInfo._id,
+      email: userInfo.email,
+      role: userInfo.role,
+    });
   } catch (error) {
     next(error);
   }
