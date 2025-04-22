@@ -12,7 +12,7 @@ export async function isAdmin(req, res, next) {
     req.user = decoded;
 
     // Check if the user is an admin
-    if (req.user.role !== "Admin") {
+    if (req.user.role !== "admin") {
       return next(createError(403, "Access Denied. You are not an Admin."));
     }
 

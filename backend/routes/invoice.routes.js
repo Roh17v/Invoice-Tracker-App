@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   createInvoice,
-  getAllInvoices,
+  getAllInvoicesForUser,
   getInvoiceById,
   getInvoicesByUser,
   updateInvoiceStatus,
@@ -15,7 +15,7 @@ const invoiceRouter = Router();
 invoiceRouter.post("/", validateToken, upload.single("file"), createInvoice);
 
 // get invoices by user
-invoiceRouter.get("/user/:userId", validateToken, getInvoicesByUser);
+invoiceRouter.get("/", validateToken, getInvoicesByUser);
 
 //update invoice status
 invoiceRouter.put("/:id", validateToken, updateInvoiceStatus);
@@ -24,6 +24,6 @@ invoiceRouter.put("/:id", validateToken, updateInvoiceStatus);
 invoiceRouter.get("/:id", validateToken, getInvoiceById);
 
 // Get all invoices with optional filters
-invoiceRouter.get("/", validateToken, getAllInvoices);
+invoiceRouter.get("/", validateToken, getAllInvoicesForUser);
 
 export default invoiceRouter;

@@ -101,7 +101,7 @@ export const getInvoiceById = async (req, res, next) => {
 
 export const getInvoicesByUser = async (req, res, next) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user._id;
 
     const invoices = await Invoice.find({
       $or: [{ createdBy: userId }, { assignedTo: userId }]
@@ -114,10 +114,15 @@ export const getInvoicesByUser = async (req, res, next) => {
 };
 
 //get invoices with filters
-export const getAllInvoices = async (req, res, next) => {
+export const getAllInvoicesForUser = async (req, res, next) => {
   try {
     const { status, vendor, category, fromDate, toDate } = req.query;
-    const filter = {};
+    const filter = {
+      $or: [
+        { createdBy: req.user._id },
+        { assignedTo: req.user._id }
+      ],
+    };
 
     if (status) filter.status = status;
     if (vendor) filter.vendorName = new RegExp(vendor, "i");
@@ -137,6 +142,7 @@ export const getAllInvoices = async (req, res, next) => {
     next(error);
   }
 };
+
 
 
   
