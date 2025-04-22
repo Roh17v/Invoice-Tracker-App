@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import { Toaster } from "sonner";
 import Home from "./pages/Home";
 import { UserProvider } from "./context/UserContext";
+import ProtectedRoute from "./components/ProtectedRoutes";
 
 function App() {
   return (
@@ -11,10 +12,15 @@ function App() {
       <UserProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-
-        
       </UserProvider>
     </>
   );
