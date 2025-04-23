@@ -10,7 +10,11 @@ import Loader from "../components/Loader";
 import { useUser } from "../context/UserContext";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
-import { HOST, RECENT_ACTIVITY_ROUTE } from "../utils/constants";
+import {
+  HOST,
+  INVOICE_STATS_ROUTE,
+  RECENT_ACTIVITY_ROUTE,
+} from "../utils/constants";
 
 const StatusTile = ({ status, count, icon, bgColor, textColor }) => (
   <div
@@ -28,21 +32,37 @@ const HomePage = () => {
   const { user } = useUser();
 
   const [invoiceStats, setInvoiceStats] = useState({
-    pending: 5,
-    approved: 3,
-    rejected: 2,
-    paid: 10,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    paid: 0,
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [activities, setActivities] = useState([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [activityError, setActivityError] = useState("");
 
   useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await axios.get(`${HOST}${INVOICE_STATS_ROUTE}`, {
+          withCredentials: true,
+        });
+        setInvoiceStats(response.data);
+      } catch (err) {
+        console.error(
+          "Error fetching invoice stats:",
+          err.response?.data || err.message
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     const fetchActivities = async () => {
       try {
         const response = await axios.get(`${HOST}${RECENT_ACTIVITY_ROUTE}`, {
-          withCredentials: "true",
+          withCredentials: true,
         });
         setActivities(response.data);
       } catch (err) {
@@ -55,6 +75,8 @@ const HomePage = () => {
         setIsLoadingActivities(false);
       }
     };
+
+    fetchStats();
     fetchActivities();
   }, []);
 

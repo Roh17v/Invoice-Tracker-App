@@ -1,6 +1,7 @@
 import { invoiceValidationSchema } from "../models/invoice.model.js";
 import { Invoice } from "../models/invoice.model.js";
 import { createError } from "../utils/error.js";
+import mongoose from "mongoose";
 
 export const createInvoice = async (req, res, next) => {
   try {
@@ -9,14 +10,8 @@ export const createInvoice = async (req, res, next) => {
       return next(createError(400, error.details[0].message));
     }
 
-    const {
-      vendorName,
-      amount,
-      dueDate,
-      category,
-      notes,
-      assignedTo,
-    } = req.body;
+    const { vendorName, amount, dueDate, category, notes, assignedTo } =
+      req.body;
 
     const userId = req.user._id;
 
@@ -52,51 +47,51 @@ export const createInvoice = async (req, res, next) => {
 };
 
 export const updateInvoiceStatus = async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const { status, note, assignedTo } = req.body;
-  
-      const invoice = await Invoice.findById(id);
-      if (!invoice) return next(createError(404, "Invoice not Found!"));
-  
-      // Only assigned reviewer or admin can update
-      if (
-        req.user.role !== "admin" &&
-        invoice.assignedTo?.toString() !== req.user._id.toString()
-      ) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-  
-      if (status) invoice.status = status;
-      if (assignedTo) invoice.assignedTo = assignedTo;
-  
-      invoice.logs.push({
-        action: status || "reassigned",
-        user: req.user._id,
-        timestamp: new Date(),
-        note: note || ""
-      });
-  
-      await invoice.save();
-      res.status(200).json({ message: "Invoice updated", invoice });
-    } catch (error) {
-      next(error);
+  try {
+    const { id } = req.params;
+    const { status, note, assignedTo } = req.body;
+
+    const invoice = await Invoice.findById(id);
+    if (!invoice) return next(createError(404, "Invoice not Found!"));
+
+    // Only assigned reviewer or admin can update
+    if (
+      req.user.role !== "admin" &&
+      invoice.assignedTo?.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({ message: "Access denied" });
     }
+
+    if (status) invoice.status = status;
+    if (assignedTo) invoice.assignedTo = assignedTo;
+
+    invoice.logs.push({
+      action: status || "reassigned",
+      user: req.user._id,
+      timestamp: new Date(),
+      note: note || "",
+    });
+
+    await invoice.save();
+    res.status(200).json({ message: "Invoice updated", invoice });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getInvoiceById = async (req, res, next) => {
-    try {
-      const invoice = await Invoice.findById(req.params.id)
-        .populate("createdBy", "name email")
-        .populate("assignedTo", "name email")
-        .populate("logs.user", "name email");
-  
-      if (!invoice) return res.status(404).json({ message: "Invoice not found" });
-  
-      res.status(200).json(invoice);
-    } catch (error) {
-      next(error);
-    }
+  try {
+    const invoice = await Invoice.findById(req.params.id)
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate("logs.user", "name email");
+
+    if (!invoice) return res.status(404).json({ message: "Invoice not found" });
+
+    res.status(200).json(invoice);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getInvoicesByUser = async (req, res, next) => {
@@ -104,7 +99,7 @@ export const getInvoicesByUser = async (req, res, next) => {
     const userId = req.user._id;
 
     const invoices = await Invoice.find({
-      $or: [{ createdBy: userId }, { assignedTo: userId }]
+      $or: [{ createdBy: userId }, { assignedTo: userId }],
     });
 
     res.status(200).json(invoices);
@@ -118,10 +113,7 @@ export const getAllInvoicesForUser = async (req, res, next) => {
   try {
     const { status, vendor, category, fromDate, toDate } = req.query;
     const filter = {
-      $or: [
-        { createdBy: req.user._id },
-        { assignedTo: req.user._id }
-      ],
+      $or: [{ createdBy: req.user._id }, { assignedTo: req.user._id }],
     };
 
     if (status) filter.status = status;
@@ -153,8 +145,8 @@ export const getRecentActivity = async (req, res) => {
     })
       .populate("createdBy", "name email")
       .populate("assignedTo", "name email")
-      .populate("logs.user", "name email") 
-      .lean(); 
+      .populate("logs.user", "name email")
+      .lean();
 
     const activities = invoices
       .flatMap((invoice) =>
@@ -182,7 +174,52 @@ export const getRecentActivity = async (req, res) => {
   }
 };
 
+// GET /api/invoices/stats
+export const getInvoiceStats = async (req, res) => {
+  try {
+    const userId = req.user._id;
 
+    const stats = await Invoice.aggregate([
+      {
+        $match: {
+          $or: [
+            { createdBy: new mongoose.Types.ObjectId(userId) },
+            { assignedTo: new mongoose.Types.ObjectId(userId) },
+          ],
+        },
+      },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          status: "$_id",
+          count: 1,
+        },
+      },
+    ]);
 
-  
-  
+    
+    const invoiceStats = {
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+      paid: 0,
+    };
+
+    stats.forEach(({ status, count }) => {
+      invoiceStats[status] = count;
+    });
+
+    res.status(200).json(invoiceStats);
+  } catch (error) {
+    console.error("Error fetching invoice stats:", error);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching invoice stats." });
+  }
+};
