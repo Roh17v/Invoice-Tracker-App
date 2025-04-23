@@ -9,7 +9,7 @@ import {
   FaFilePdf,
   FaFileImage,
 } from "react-icons/fa";
-import { HOST, INVOICE_ROUTE } from "../utils/constants";
+import { HOST, INVOICE_ROUTE, USER_ROUTE } from "../utils/constants";
 import { useInvoice } from "../context/InvoiceContext";
 
 const CreateInvoiceModal = ({ isOpen, onClose }) => {
@@ -26,20 +26,25 @@ const CreateInvoiceModal = ({ isOpen, onClose }) => {
   const [fileName, setFileName] = useState("");
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [users, setUsers] = useState([
-    {
-      _id: "680659a8d47b27ff7ef68e66",
-      name: "Rohit Verma",
-      email: "rohitverma@gmail.com",
-    },
-    {
-      _id: "68067b8f0491aa9694247d5f",
-      name: "Ayush Verma",
-      email: "ayushverma@gmail.com",
-    },
-  ]);
+  const [users, setUsers] = useState([]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+      try {
+        const respone = await axios.get(`${HOST}${USER_ROUTE}`, {
+          withCredentials: "true",
+        });
+
+        if (respone.status === 200) {
+          setUsers(respone.data);
+        }
+      } catch (error) {
+        console.log(errors);
+      }
+    };
+
+    fetchAllUsers();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -6,6 +6,7 @@ import authRouter from "./routes/auth.routes.js";
 import invoiceRouter from "./routes/invoice.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import cors from "cors";
+import userRouter from "./routes/user.routes.js";
 
 const app = express();
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/invoices", invoiceRouter);
+app.use("/api/users", userRouter);
 app.get("/api/check-health", (req, res) => res.send("ok"));
 
 //Error Handler

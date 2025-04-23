@@ -14,4 +14,4 @@ export const RECENT_ACTIVITY_ROUTE = `${INVOICE_ROUTE}/recent-activity`;
 
 export const INVOICE_STATS_ROUTE = `${INVOICE_ROUTE}/stats`;
 
-
+export const USER_ROUTE = `/api/users`;
