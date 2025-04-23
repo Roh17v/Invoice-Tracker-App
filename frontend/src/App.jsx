@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import { UserProvider, useUser } from "./context/UserContext";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import Loader from "./components/Loader";
+import NotFound from "./components/NotFound";
 
 function App() {
   const { isLoading } = useUser();
@@ -24,6 +25,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
