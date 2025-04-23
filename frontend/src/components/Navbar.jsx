@@ -68,7 +68,7 @@ const Navbar = () => {
             </Link>
             <button
               onClick={handleLogout}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 cursor-pointer"
             >
               Logout
             </button>
@@ -127,7 +127,7 @@ const Navbar = () => {
                 handleLogout();
                 toggleMenu();
               }}
-              className="w-full text-left bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition duration-200"
+              className="w-full text-left bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition duration-200 cursor-pointer"
             >
               Logout
             </button>

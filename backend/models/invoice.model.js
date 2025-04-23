@@ -44,7 +44,7 @@ const invoiceSchema = new mongoose.Schema(
       {
         action: {
           type: String,
-          enum: ["submitted", "approved", "rejected", "reassigned"],
+          enum: ["submitted", "approved", "rejected", "reassigned", "paid"],
         },
         user: {
           type: mongoose.Schema.Types.ObjectId,

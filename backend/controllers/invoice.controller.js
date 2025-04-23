@@ -62,18 +62,34 @@ export const updateInvoiceStatus = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    if (status) invoice.status = status;
-    if (assignedTo) invoice.assignedTo = assignedTo;
+    let actionLabel = null;
+
+    // Handle valid status updates
+    const validStatuses = ["approved", "rejected", "paid"];
+    if (status && validStatuses.includes(status)) {
+      invoice.status = status;
+      actionLabel = status;
+    }
+
+    // Handle reassignment
+    if (assignedTo && assignedTo !== invoice.assignedTo?.toString()) {
+      invoice.assignedTo = assignedTo;
+      if (!actionLabel) actionLabel = "reassigned";
+    }
+
+    if (!actionLabel) {
+      return res.status(400).json({ message: "No valid update provided" });
+    }
 
     invoice.logs.push({
-      action: status || "reassigned",
+      action: actionLabel,
       user: req.user._id,
       timestamp: new Date(),
       note: note || "",
     });
 
     await invoice.save();
-    res.status(200).json({ message: "Invoice updated", invoice });
+    res.status(200).json({ message: "Invoice updated successfully", invoice });
   } catch (error) {
     next(error);
   }
@@ -192,6 +208,7 @@ export const getInvoiceStats = async (req, res) => {
         $group: {
           _id: "$status",
           count: { $sum: 1 },
+          totalAmount: { $sum: "$amount" },
         },
       },
       {
@@ -199,19 +216,20 @@ export const getInvoiceStats = async (req, res) => {
           _id: 0,
           status: "$_id",
           count: 1,
+          totalAmount: 1,
         },
       },
     ]);
 
     const invoiceStats = {
-      pending: 0,
-      approved: 0,
-      rejected: 0,
-      paid: 0,
+      pending: { count: 0, totalAmount: 0 },
+      approved: { count: 0, totalAmount: 0 },
+      rejected: { count: 0, totalAmount: 0 },
+      paid: { count: 0, totalAmount: 0 },
     };
 
-    stats.forEach(({ status, count }) => {
-      invoiceStats[status] = count;
+    stats.forEach(({ status, count, totalAmount }) => {
+      invoiceStats[status] = { count, totalAmount };
     });
 
     res.status(200).json(invoiceStats);

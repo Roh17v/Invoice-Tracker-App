@@ -18,14 +18,19 @@ import {
 import CreateInvoiceModal from "../components/CreateInvoiceModal";
 import { useInvoice } from "../context/InvoiceContext";
 
-const StatusTile = ({ status, count, icon, bgColor, textColor }) => (
+const StatusTile = ({ status, count, amount, icon, bgColor, textColor }) => (
   <div
-    className={`p-6 rounded-lg shadow-md ${bgColor} ${textColor} hover:shadow-lg transition duration-200 flex items-center space-x-4 min-w-[150px]`}
+    className={`p-6 rounded-lg shadow-md ${bgColor} ${textColor} hover:shadow-lg transition duration-200 flex flex-col justify-between min-w-[150px]`}
   >
-    <div>{icon}</div>
-    <div>
-      <h2 className="text-lg font-semibold">{status}</h2>
-      <p className="text-2xl font-bold">{count}</p>
+    <div className="flex items-center space-x-4">
+      <div>{icon}</div>
+      <div>
+        <h2 className="text-lg font-semibold">{status}</h2>
+        <p className="text-2xl font-bold">{count}</p>
+      </div>
+    </div>
+    <div className="mt-4 text-sm font-medium">
+      Amount: ₹{amount.toLocaleString("en-IN")}
     </div>
   </div>
 );
@@ -34,11 +39,12 @@ const HomePage = () => {
   const { user } = useUser();
 
   const [invoiceStats, setInvoiceStats] = useState({
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-    paid: 0,
+    pending: { count: 0, totalAmount: 0 },
+    approved: { count: 0, totalAmount: 0 },
+    rejected: { count: 0, totalAmount: 0 },
+    paid: { count: 0, totalAmount: 0 },
   });
+
   const [isLoading, setIsLoading] = useState(true);
   const [activities, setActivities] = useState([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
@@ -88,28 +94,32 @@ const HomePage = () => {
   const statusTiles = [
     {
       status: "Pending",
-      count: invoiceStats.pending,
+      count: invoiceStats.pending.count,
+      amount: invoiceStats.pending.totalAmount,
       icon: <FaClock className="w-6 h-6" />,
       bgColor: "bg-yellow-100",
       textColor: "text-yellow-800",
     },
     {
       status: "Approved",
-      count: invoiceStats.approved,
+      count: invoiceStats.approved.count,
+      amount: invoiceStats.approved.totalAmount,
       icon: <FaCheckCircle className="w-6 h-6" />,
       bgColor: "bg-green-100",
       textColor: "text-green-800",
     },
     {
       status: "Rejected",
-      count: invoiceStats.rejected,
+      count: invoiceStats.rejected.count,
+      amount: invoiceStats.rejected.totalAmount,
       icon: <FaTimesCircle className="w-6 h-6" />,
       bgColor: "bg-red-100",
       textColor: "text-red-800",
     },
     {
       status: "Paid",
-      count: invoiceStats.paid,
+      count: invoiceStats.paid.count,
+      amount: invoiceStats.paid.totalAmount,
       icon: <FaMoneyCheckAlt className="w-6 h-6" />,
       bgColor: "bg-blue-100",
       textColor: "text-blue-800",

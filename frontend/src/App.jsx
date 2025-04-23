@@ -6,6 +6,7 @@ import { UserProvider, useUser } from "./context/UserContext";
 import ProtectedRoute from "./components/ProtectedRoutes";
 import Loader from "./components/Loader";
 import NotFound from "./components/NotFound";
+import MyInvoices from "./pages/MyInvoices";
 
 function App() {
   const { isLoading } = useUser();
@@ -25,7 +26,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/my-invoices"
+          element={
+            <ProtectedRoute>
+              <MyInvoices />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
