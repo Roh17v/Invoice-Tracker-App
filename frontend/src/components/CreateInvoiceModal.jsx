@@ -10,6 +10,7 @@ import {
   FaFileImage,
 } from "react-icons/fa";
 import { HOST, INVOICE_ROUTE } from "../utils/constants";
+import { useInvoice } from "../context/InvoiceContext";
 
 const CreateInvoiceModal = ({ isOpen, onClose }) => {
   const [form, setForm] = useState({
@@ -101,6 +102,8 @@ const CreateInvoiceModal = ({ isOpen, onClose }) => {
     return newErrors;
   };
 
+  const { triggerRefresh } = useInvoice();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
@@ -143,6 +146,7 @@ const CreateInvoiceModal = ({ isOpen, onClose }) => {
       toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setIsSubmitting(false);
+      triggerRefresh();
     }
   };
 

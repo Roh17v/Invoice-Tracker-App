@@ -5,13 +5,16 @@ import App from "./App.jsx";
 import { StrictMode } from "react";
 import { Toaster } from "sonner";
 import { UserProvider } from "./context/UserContext.jsx";
+import { InvoiceProvider } from "./context/InvoiceContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <UserProvider>
-        <App />
-        <Toaster position="top-right" richColors />
+        <InvoiceProvider>
+          <App />
+          <Toaster position="top-right" richColors />
+        </InvoiceProvider>
       </UserProvider>
     </BrowserRouter>
   </StrictMode>

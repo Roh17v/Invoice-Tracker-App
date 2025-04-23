@@ -30,7 +30,7 @@ export const createInvoice = async (req, res, next) => {
         {
           action: "submitted",
           user: userId,
-          note: "Invoice submitted.",
+          note: notes || "Invoice submitted.",
         },
       ],
     });
@@ -203,7 +203,6 @@ export const getInvoiceStats = async (req, res) => {
       },
     ]);
 
-    
     const invoiceStats = {
       pending: 0,
       approved: 0,

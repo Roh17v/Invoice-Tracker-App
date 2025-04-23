@@ -16,6 +16,7 @@ import {
   RECENT_ACTIVITY_ROUTE,
 } from "../utils/constants";
 import CreateInvoiceModal from "../components/CreateInvoiceModal";
+import { useInvoice } from "../context/InvoiceContext";
 
 const StatusTile = ({ status, count, icon, bgColor, textColor }) => (
   <div
@@ -43,6 +44,8 @@ const HomePage = () => {
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [activityError, setActivityError] = useState("");
   const [showModal, setShowModal] = useState(false);
+
+  const { refreshKey } = useInvoice();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -80,7 +83,7 @@ const HomePage = () => {
 
     fetchStats();
     fetchActivities();
-  }, []);
+  }, [refreshKey]);
 
   const statusTiles = [
     {
