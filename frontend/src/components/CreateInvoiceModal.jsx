@@ -39,7 +39,7 @@ const CreateInvoiceModal = ({ isOpen, onClose }) => {
           setUsers(respone.data);
         }
       } catch (error) {
-        console.log(errors);
+        console.log(error);
       }
     };
 

@@ -116,7 +116,10 @@ export const getInvoicesByUser = async (req, res, next) => {
 
     const invoices = await Invoice.find({
       $or: [{ createdBy: userId }, { assignedTo: userId }],
-    });
+    })
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate("logs.user", "name email");
 
     res.status(200).json(invoices);
   } catch (error) {
@@ -143,7 +146,8 @@ export const getAllInvoicesForUser = async (req, res, next) => {
 
     const invoices = await Invoice.find(filter)
       .populate("createdBy", "name email")
-      .populate("assignedTo", "name email");
+      .populate("assignedTo", "name email")
+      .populate("logs.user", "name email");
 
     res.status(200).json(invoices);
   } catch (error) {

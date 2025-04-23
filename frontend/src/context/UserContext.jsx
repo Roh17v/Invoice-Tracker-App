@@ -46,7 +46,6 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   const login = async (userData, navigate) => {
-    console.log("Inside login");
     try {
       const response = await axios.post(`${HOST}${LOGIN_ROUTE}`, userData, {
         withCredentials: true,
@@ -68,13 +67,14 @@ export const UserProvider = ({ children }) => {
   const logout = async () => {
     try {
       const response = await axios.post(`${HOST}${LOGOUT_ROUTE}`, {
-        withCredentials: "true",
+        withCredentials: true,
       });
+
+      console.log(response);
 
       if (response.status === 200) {
         setUser(null);
         toast.success("Logged Out Successfully!", { id: "logout-success" });
-        setTimeout(() => navigate("/login"), 2000);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
