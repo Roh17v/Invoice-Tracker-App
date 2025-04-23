@@ -13,3 +13,5 @@ export const INVOICE_ROUTE = "/api/invoices";
 export const RECENT_ACTIVITY_ROUTE = `${INVOICE_ROUTE}/recent-activity`;
 
 export const INVOICE_STATS_ROUTE = `${INVOICE_ROUTE}/stats`;
+
+

@@ -15,6 +15,7 @@ import {
   INVOICE_STATS_ROUTE,
   RECENT_ACTIVITY_ROUTE,
 } from "../utils/constants";
+import CreateInvoiceModal from "../components/CreateInvoiceModal";
 
 const StatusTile = ({ status, count, icon, bgColor, textColor }) => (
   <div
@@ -41,6 +42,7 @@ const HomePage = () => {
   const [activities, setActivities] = useState([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
   const [activityError, setActivityError] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -130,10 +132,20 @@ const HomePage = () => {
           </div>
 
           <div className="mb-10">
-            <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+            <button
+              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition cursor-pointer"
+              onClick={() => setShowModal(true)}
+            >
               + New Invoice
             </button>
           </div>
+
+          {showModal && (
+            <CreateInvoiceModal
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+            />
+          )}
 
           <div>
             <h2 className="text-xl font-semibold mb-4 text-gray-800">
@@ -150,7 +162,7 @@ const HomePage = () => {
                 activities.map((activity, idx) => (
                   <li key={idx} className="text-gray-700">
                     {activity.userName} {activity.action} invoice "
-                    {activity.vendorName}" ${activity.amount}{" "}
+                    {activity.vendorName}" ₹{activity.amount}{" "}
                     {formatDistanceToNow(new Date(activity.timestamp), {
                       addSuffix: true,
                     })}
