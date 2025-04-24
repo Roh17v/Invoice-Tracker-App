@@ -7,6 +7,7 @@ import {
   FaTimes,
   FaEllipsisV,
   FaSearch,
+  FaEye,
 } from "react-icons/fa";
 import {
   Menu,
@@ -39,6 +40,7 @@ const MyInvoices = () => {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showReassignModal, setShowReassignModal] = useState(false);
+  const [showFileModal, setShowFileModal] = useState(false); // New state for file modal
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [users, setUsers] = useState([]);
@@ -81,7 +83,7 @@ const MyInvoices = () => {
     fetchAllUsers();
   }, []);
 
-  // Fetch invoices (initial load or on search)
+  // Fetch invoices
   const fetchInvoices = async () => {
     setIsLoading(true);
     try {
@@ -262,6 +264,12 @@ const MyInvoices = () => {
     setShowHistory(true);
   };
 
+  // Open file modal
+  const openFileModal = (invoice) => {
+    setSelectedInvoice(invoice);
+    setShowFileModal(true);
+  };
+
   // Pagination logic
   const indexOfLastInvoice = currentPage * invoicesPerPage;
   const indexOfFirstInvoice = indexOfLastInvoice - invoicesPerPage;
@@ -272,6 +280,10 @@ const MyInvoices = () => {
   const totalPages = Math.ceil(filteredInvoices.length / invoicesPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // Determine file type
+  const isImage = (filePath) => /\.(jpg|jpeg|png|gif)$/i.test(filePath);
+  const isPDF = (filePath) => /\.pdf$/i.test(filePath);
 
   if (isLoading) return <Loader />;
 
@@ -396,7 +408,7 @@ const MyInvoices = () => {
           {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
           {/* Invoices Table */}
-          <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+          <div className="bg-white shadow-sm rounded-lg">
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-100">
@@ -479,8 +491,7 @@ const MyInvoices = () => {
                           {invoice.assignedTo?.name || "Unassigned"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center space-x-6">
-                          {invoice.status !== "paid" &&
-                          invoice.status !== "approved" &&
+                          {invoice.status === "pending" &&
                           (invoice.assignedTo?._id === currentUser._id ||
                             currentUser.role === "admin") ? (
                             <Menu
@@ -499,7 +510,7 @@ const MyInvoices = () => {
                                 leaveFrom="transform opacity-100 scale-100"
                                 leaveTo="transform opacity-0 scale-95"
                               >
-                                <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                                <MenuItems className="absolute right-0 top-0 mt-2 w-48 max-h-screen overflow-y-auto origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20">
                                   {invoice.status === "pending" && (
                                     <div className="py-1">
                                       <MenuItem>
@@ -561,6 +572,14 @@ const MyInvoices = () => {
                               </Transition>
                             </Menu>
                           ) : null}
+                          {invoice.filePath && (
+                            <button
+                              onClick={() => openFileModal(invoice)}
+                              className="text-gray-600 hover:text-gray-800 flex items-center text-sm"
+                            >
+                              <FaEye className="mr-1" /> View
+                            </button>
+                          )}
                           <button
                             onClick={() => openHistory(invoice)}
                             className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
@@ -620,7 +639,7 @@ const MyInvoices = () => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <div className="fixed inset-0 bg-black bg-opacity-50" />
+                  <div className="fixed inset-0 backdrop-blur-md bg-opacity-50" />
                 </TransitionChild>
                 <div className="fixed inset-0 overflow-y-auto">
                   <div className="flex min-h-full items-center justify-center p-4">
@@ -688,7 +707,7 @@ const MyInvoices = () => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <div className="fixed inset-0 bg-black bg-opacity-50" />
+                  <div className="fixed inset-0 backdrop-blur-md bg-opacity-50" />
                 </TransitionChild>
                 <div className="fixed inset-0 overflow-y-auto">
                   <div className="flex min-h-full items-center justify-center p-4">
@@ -756,7 +775,7 @@ const MyInvoices = () => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <div className="fixed inset-0 bg-black bg-opacity-50" />
+                  <div className="fixed inset-0 backdrop-blur-md bg-opacity-50" />
                 </TransitionChild>
                 <div className="fixed inset-0 overflow-y-auto">
                   <div className="flex min-h-full items-center justify-center p-4">
@@ -819,6 +838,81 @@ const MyInvoices = () => {
                             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm"
                           >
                             Reassign
+                          </button>
+                        </div>
+                      </DialogPanel>
+                    </TransitionChild>
+                  </div>
+                </div>
+              </Dialog>
+            </Transition>
+          )}
+          {showFileModal && selectedInvoice && (
+            <Transition appear show={showFileModal} as={Fragment}>
+              <Dialog
+                as="div"
+                className="relative z-50"
+                onClose={() => setShowFileModal(false)}
+              >
+                <TransitionChild
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <div className="fixed inset-0 backdrop-blur-md bg-opacity-50" />
+                </TransitionChild>
+                <div className="fixed inset-0 overflow-y-auto">
+                  <div className="flex min-h-full items-center justify-center p-4">
+                    <TransitionChild
+                      as={Fragment}
+                      enter="ease-out duration-300"
+                      enterFrom="opacity-0 scale-95"
+                      enterTo="opacity-100 scale-100"
+                      leave="ease-in duration-200"
+                      leaveFrom="opacity-100 scale-100"
+                      leaveTo="opacity-0 scale-95"
+                    >
+                      <DialogPanel className="w-full max-w-4xl bg-white rounded-lg p-6">
+                        <DialogTitle
+                          as="h3"
+                          className="text-lg font-semibold text-gray-900 mb-4"
+                        >
+                          View Invoice #
+                          {selectedInvoice.number || selectedInvoice._id}
+                        </DialogTitle>
+                        <div className="mb-4">
+                          {isImage(selectedInvoice.filePath) ? (
+                            <img
+                              src={`${HOST}/${selectedInvoice.filePath}`}
+                              alt="Invoice"
+                              className="w-full h-auto max-h-[70vh] object-contain"
+                              onError={() =>
+                                toast.error("Failed to load image")
+                              }
+                            />
+                          ) : isPDF(selectedInvoice.filePath) ? (
+                            <iframe
+                              src={`${HOST}/${selectedInvoice.filePath}`}
+                              title="Invoice PDF"
+                              className="w-full h-[70vh]"
+                              onError={() => toast.error("Failed to load PDF")}
+                            />
+                          ) : (
+                            <p className="text-red-600 text-sm">
+                              Unsupported file format
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => setShowFileModal(false)}
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition text-sm"
+                          >
+                            Close
                           </button>
                         </div>
                       </DialogPanel>

@@ -13,6 +13,10 @@ import { Fragment } from "react";
 const InvoiceHistory = ({ invoice, onClose }) => {
   // Map actions to icons and colors for visual distinction
   const actionStyles = {
+    paid: {
+      icon: <FaCheck className="text-blue-500" />,
+      label: "Paid",
+    },
     approved: {
       icon: <FaCheck className="text-green-500" />,
       label: "Approved",
@@ -37,7 +41,7 @@ const InvoiceHistory = ({ invoice, onClose }) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
+          <div className="fixed inset-0 backdrop-blur-md bg-opacity-50" />
         </TransitionChild>
 
         {/* Modal */}

@@ -158,7 +158,7 @@ const CreateInvoiceModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur flex items-center justify-center z-50">
+    <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
           <FaFileUpload className="mr-2 text-blue-600" /> Create New Invoice

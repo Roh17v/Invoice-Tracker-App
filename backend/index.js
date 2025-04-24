@@ -7,9 +7,14 @@ import invoiceRouter from "./routes/invoice.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import cors from "cors";
 import userRouter from "./routes/user.routes.js";
+import { fileURLToPath } from "url";
+import path from "path";
 
 const app = express();
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 //middlewares
 app.use(
@@ -26,6 +31,9 @@ app.use("/api/admin", adminRouter);
 app.use("/api/invoices", invoiceRouter);
 app.use("/api/users", userRouter);
 app.get("/api/check-health", (req, res) => res.send("ok"));
+
+//middleware to server static files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 //Error Handler
 app.use((err, req, res, next) => {
