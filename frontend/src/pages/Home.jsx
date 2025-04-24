@@ -160,7 +160,7 @@ const HomePage = () => {
             />
           )}
 
-          <div className="pb-[1000px]">
+          <div>
             <h2 className="text-xl font-semibold mb-4 text-gray-800">
               Recent Activity
             </h2>

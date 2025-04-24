@@ -5,20 +5,15 @@ import {
   FaFilter,
   FaCheck,
   FaTimes,
-  FaEllipsisV,
   FaSearch,
   FaEye,
 } from "react-icons/fa";
 import {
-  Menu,
   Dialog,
   TransitionChild,
-  MenuButton,
   Transition,
-  MenuItems,
   DialogTitle,
   DialogPanel,
-  MenuItem,
 } from "@headlessui/react";
 import Navbar from "../components/Navbar";
 import InvoiceHistory from "../components/InvoiceHistory";
@@ -40,7 +35,7 @@ const MyInvoices = () => {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showReassignModal, setShowReassignModal] = useState(false);
-  const [showFileModal, setShowFileModal] = useState(false); // New state for file modal
+  const [showFileModal, setShowFileModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [users, setUsers] = useState([]);
@@ -444,7 +439,7 @@ const MyInvoices = () => {
                     <tr>
                       <td
                         colSpan={8}
-                        className="px-6 py-6 text-center text-gray-500 text-sm"
+                        className="px-6 py-4 text-center text-gray-500 text-sm"
                       >
                         No invoices found
                       </td>
@@ -490,102 +485,58 @@ const MyInvoices = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 hidden md:table-cell">
                           {invoice.assignedTo?.name || "Unassigned"}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex items-center space-x-6">
-                          {invoice.status === "pending" &&
-                          (invoice.assignedTo?._id === currentUser._id ||
-                            currentUser.role === "admin") ? (
-                            <Menu
-                              as="div"
-                              className="relative inline-block text-left"
-                            >
-                              <MenuButton className="p-2 rounded-full hover:bg-gray-200 transition">
-                                <FaEllipsisV className="text-gray-600" />
-                              </MenuButton>
-                              <Transition
-                                as={Fragment}
-                                enter="transition ease-out duration-100"
-                                enterFrom="transform opacity-0 scale-95"
-                                enterTo="transform opacity-100 scale-100"
-                                leave="transition ease-in duration-75"
-                                leaveFrom="transform opacity-100 scale-100"
-                                leaveTo="transform opacity-0 scale-95"
+                        <td className="px-6 py-4 text-sm font-medium">
+                          <div className="flex flex-col space-y-2">
+                            {invoice.status === "pending" &&
+                              (invoice.assignedTo?._id === currentUser._id ||
+                                currentUser.role === "admin") && (
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      handleOpenApproveModal(invoice)
+                                    }
+                                    className="text-green-600 hover:text-green-800 flex items-center text-sm"
+                                  >
+                                    <FaCheck className="mr-1 h-4 w-4" />
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleOpenRejectModal(invoice)
+                                    }
+                                    className="text-red-600 hover:text-red-800 flex items-center text-sm"
+                                  >
+                                    <FaTimes className="mr-1 h-4 w-4" />
+                                    Reject
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleOpenReassignModal(invoice)
+                                    }
+                                    className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                                  >
+                                    <FaUserEdit className="mr-1 h-4 w-4" />
+                                    Reassign
+                                  </button>
+                                </>
+                              )}
+                            {invoice.filePath && (
+                              <button
+                                onClick={() => openFileModal(invoice)}
+                                className="text-gray-600 hover:text-gray-800 flex items-center text-sm"
                               >
-                                <MenuItems className="absolute right-0 top-0 mt-2 w-48 max-h-screen overflow-y-auto origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-20">
-                                  {invoice.status === "pending" && (
-                                    <div className="py-1">
-                                      <MenuItem>
-                                        {({ active }) => (
-                                          <button
-                                            onClick={() =>
-                                              handleOpenApproveModal(invoice)
-                                            }
-                                            className={`${
-                                              active
-                                                ? "bg-green-50 text-green-800"
-                                                : "text-gray-900"
-                                            } group flex w-full items-center px-4 py-2 text-sm`}
-                                          >
-                                            <FaCheck className="mr-3 h-5 w-5 text-green-600" />
-                                            Approve
-                                          </button>
-                                        )}
-                                      </MenuItem>
-                                      <MenuItem>
-                                        {({ active }) => (
-                                          <button
-                                            onClick={() =>
-                                              handleOpenRejectModal(invoice)
-                                            }
-                                            className={`${
-                                              active
-                                                ? "bg-red-50 text-red-800"
-                                                : "text-gray-900"
-                                            } group flex w-full items-center px-4 py-2 text-sm`}
-                                          >
-                                            <FaTimes className="mr-3 h-5 w-5 text-red-600" />
-                                            Reject
-                                          </button>
-                                        )}
-                                      </MenuItem>
-                                    </div>
-                                  )}
-                                  <div className="py-1">
-                                    <MenuItem>
-                                      {({ active }) => (
-                                        <button
-                                          onClick={() =>
-                                            handleOpenReassignModal(invoice)
-                                          }
-                                          className={`${
-                                            active
-                                              ? "bg-blue-50 text-blue-800"
-                                              : "text-gray-900"
-                                          } group flex w-full items-center px-4 py-2 text-sm`}
-                                        >
-                                          <FaUserEdit className="mr-3 h-5 w-5 text-blue-600" />
-                                          Reassign
-                                        </button>
-                                      )}
-                                    </MenuItem>
-                                  </div>
-                                </MenuItems>
-                              </Transition>
-                            </Menu>
-                          ) : null}
-                          {invoice.filePath && (
+                                <FaEye className="mr-1 h-4 w-4" />
+                                View
+                              </button>
+                            )}
                             <button
-                              onClick={() => openFileModal(invoice)}
-                              className="text-gray-600 hover:text-gray-800 flex items-center text-sm"
+                              onClick={() => openHistory(invoice)}
+                              className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
                             >
-                              <FaEye className="mr-1" /> View
+                              <FaHistory className="mr-1 h-4 w-4" />
+                              History
                             </button>
-                          )}
-                          <button
-                            onClick={() => openHistory(invoice)}
-                            className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
-                          >
-                            <FaHistory className="mr-1" /> History
-                          </button>
+                          </div>
                         </td>
                       </tr>
                     ))

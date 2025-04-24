@@ -55,6 +55,7 @@ export const updateInvoiceStatus = async (req, res, next) => {
     if (!invoice) return next(createError(404, "Invoice not Found!"));
 
     // Only assigned reviewer or admin can update
+
     if (
       req.user.role !== "admin" &&
       invoice.assignedTo?.toString() !== req.user._id.toString()
@@ -89,6 +90,12 @@ export const updateInvoiceStatus = async (req, res, next) => {
     });
 
     await invoice.save();
+
+    await invoice.populate([
+      { path: "createdBy", select: "name email" },
+      { path: "assignedTo", select: "name email" },
+      { path: "logs.user", select: "name email" },
+    ]);
     res.status(200).json({ message: "Invoice updated successfully", invoice });
   } catch (error) {
     next(error);
