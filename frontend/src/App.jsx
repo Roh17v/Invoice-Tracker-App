@@ -30,7 +30,7 @@ function App() {
         <Route
           path="/my-invoices"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole="reviewer">
               <MyInvoices />
             </ProtectedRoute>
           }
@@ -38,11 +38,12 @@ function App() {
         <Route
           path="/admin-dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole="admin">
               <AdminDashboard />
             </ProtectedRoute>
           }
         />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

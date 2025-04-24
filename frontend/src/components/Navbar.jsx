@@ -7,7 +7,7 @@ const Navbar = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  const { logout } = useUser();
+  const { logout, user } = useUser();
   const location = useLocation();
 
   const toggleMenu = () => {
@@ -21,11 +21,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        setIsVisible(false); // Scroll down → hide navbar
-      } else {
-        setIsVisible(true); // Scroll up → show navbar
-      }
+      setIsVisible(currentScrollY <= lastScrollY || currentScrollY < 50);
       setLastScrollY(currentScrollY);
     };
 
@@ -40,6 +36,9 @@ const Navbar = () => {
         : "text-gray-600 hover:text-blue-600"
     }`;
 
+  const isAdmin = user?.role === "admin";
+  const isReviewer = user?.role === "reviewer";
+
   return (
     <nav
       className={`bg-white shadow-md fixed top-0 left-0 right-0 z-50 transition-transform duration-300 ${
@@ -48,27 +47,33 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          {/* Logo/Branding */}
           <div className="flex items-center">
             <Link to="/" className="text-2xl font-bold text-blue-600">
               InvoicePro
             </Link>
           </div>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/" className={linkClass("/")}>
               Home
             </Link>
-            <Link to="/my-invoices" className={linkClass("/my-invoices")}>
-              My Invoices
-            </Link>
-            <Link
-              to="/admin-dashboard"
-              className={linkClass("/admin-dashboard")}
-            >
-              Admin Dashboard
-            </Link>
+
+            {isReviewer && (
+              <Link to="/my-invoices" className={linkClass("/my-invoices")}>
+                My Invoices
+              </Link>
+            )}
+
+            {/* Only visible to admin */}
+            {isAdmin && (
+              <Link
+                to="/admin-dashboard"
+                className={linkClass("/admin-dashboard")}
+              >
+                Admin Dashboard
+              </Link>
+            )}
+
             <button
               onClick={handleLogout}
               className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200 cursor-pointer"
@@ -77,18 +82,17 @@ const Navbar = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile menu toggle */}
           <div className="md:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="text-gray-600 hover:text-blue-600 focus:outline-none"
+              className="text-gray-600 hover:text-blue-600"
             >
               <svg
                 className="h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
@@ -104,13 +108,14 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu content */}
       {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link to="/" onClick={toggleMenu} className={linkClass("/")}>
-              Home
-            </Link>
+        <div className="md:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <Link to="/" onClick={toggleMenu} className={linkClass("/")}>
+            Home
+          </Link>
+
+          {isReviewer && (
             <Link
               to="/my-invoices"
               onClick={toggleMenu}
@@ -118,6 +123,9 @@ const Navbar = () => {
             >
               My Invoices
             </Link>
+          )}
+
+          {isAdmin && (
             <Link
               to="/admin-dashboard"
               onClick={toggleMenu}
@@ -125,16 +133,17 @@ const Navbar = () => {
             >
               Admin Dashboard
             </Link>
-            <button
-              onClick={() => {
-                handleLogout();
-                toggleMenu();
-              }}
-              className="w-full text-left bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition duration-200 cursor-pointer"
-            >
-              Logout
-            </button>
-          </div>
+          )}
+
+          <button
+            onClick={() => {
+              handleLogout();
+              toggleMenu();
+            }}
+            className="w-full text-left bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 cursor-pointer"
+          >
+            Logout
+          </button>
         </div>
       )}
     </nav>
