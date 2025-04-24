@@ -63,8 +63,11 @@ const Navbar = () => {
             <Link to="/my-invoices" className={linkClass("/my-invoices")}>
               My Invoices
             </Link>
-            <Link to="/dashboard" className={linkClass("/dashboard")}>
-              Dashboard
+            <Link
+              to="/admin-dashboard"
+              className={linkClass("/admin-dashboard")}
+            >
+              Admin Dashboard
             </Link>
             <button
               onClick={handleLogout}
@@ -116,11 +119,11 @@ const Navbar = () => {
               My Invoices
             </Link>
             <Link
-              to="/dashboard"
+              to="/admin-dashboard"
               onClick={toggleMenu}
-              className={linkClass("/dashboard")}
+              className={linkClass("/admin-dashboard")}
             >
-              Dashboard
+              Admin Dashboard
             </Link>
             <button
               onClick={() => {

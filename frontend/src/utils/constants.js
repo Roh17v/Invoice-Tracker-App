@@ -15,3 +15,15 @@ export const RECENT_ACTIVITY_ROUTE = `${INVOICE_ROUTE}/recent-activity`;
 export const INVOICE_STATS_ROUTE = `${INVOICE_ROUTE}/stats`;
 
 export const USER_ROUTE = `/api/users`;
+
+export const ADMIN_ROUTE = `/api/admin`;
+
+export const GET_ALL_USERS_ADMIN = `${ADMIN_ROUTE}/get-all-users`;
+
+export const GET_ALL_INVOICES_ADMIN = `${ADMIN_ROUTE}/invoices`;
+
+export const UPDATE_INVOICE_STATUS = `${ADMIN_ROUTE}/invoice`;
+
+export const CREATE_NEW_USER = `${ADMIN_ROUTE}/create-user`;
+
+export const DELETE_USER_ROUTE = `${ADMIN_ROUTE}/users`;

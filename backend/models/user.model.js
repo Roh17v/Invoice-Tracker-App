@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import { genSalt, hash } from "bcrypt";
 import Joi from "joi";
 
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -64,8 +63,7 @@ export const userValidationSchema = Joi.object({
     "string.min": "Password must be at least 6 characters",
   }),
 
-  role: Joi.string().valid("Admin", "Reviewer").optional()
+  role: Joi.string().valid("admin", "reviewer").optional(),
 });
-
 
 export const User = mongoose.model("User", userSchema);

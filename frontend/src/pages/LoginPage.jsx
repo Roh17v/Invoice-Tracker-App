@@ -30,7 +30,7 @@ const LoginPage = () => {
         <div className="w-full md:w-1/2 bg-blue-50 p-8 flex items-center justify-center">
           <div className="text-center">
             <img
-              src="../../public/illustration.jpg"
+              src="/illustration.jpg"
               alt="Invoice Illustration"
               className="w-3/4 mx-auto"
             />

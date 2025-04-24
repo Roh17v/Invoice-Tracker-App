@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoutes";
 import Loader from "./components/Loader";
 import NotFound from "./components/NotFound";
 import MyInvoices from "./pages/MyInvoices";
+import AdminDashboard from "./components/AdminDashboard";
 
 function App() {
   const { isLoading } = useUser();
@@ -31,6 +32,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MyInvoices />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
