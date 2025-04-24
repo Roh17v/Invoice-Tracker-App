@@ -24,6 +24,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import {
   GET_ALL_INVOICES_ADMIN,
+  GET_ALL_USERS_ADMIN,
   HOST,
   INVOICE_ROUTE,
   USER_ROUTE,
@@ -41,7 +42,7 @@ const Invoices = () => {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showReassignModal, setShowReassignModal] = useState(false);
-  const [showPaidModal, setShowPaidModal] = useState(false); 
+  const [showPaidModal, setShowPaidModal] = useState(false);
   const [showFileModal, setShowFileModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -70,7 +71,7 @@ const Invoices = () => {
   useEffect(() => {
     const fetchAllUsers = async () => {
       try {
-        const response = await axios.get(`${HOST}${GET_ALL_INVOICES_ADMIN}`, {
+        const response = await axios.get(`${HOST}${GET_ALL_USERS_ADMIN}`, {
           withCredentials: true,
         });
         setUsers(response.data);
