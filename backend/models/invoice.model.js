@@ -12,11 +12,22 @@ const invoiceSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
-        "utilities", "software", "office supplies", "travel", "consulting", 
-        "marketing", "maintenance", "training", "legal", "subscription", 
-        "insurance", "it services", "logistics", "hr services", "miscellaneous"
-      ]
-      ,
+        "utilities",
+        "software",
+        "office supplies",
+        "travel",
+        "consulting",
+        "marketing",
+        "maintenance",
+        "training",
+        "legal",
+        "subscription",
+        "insurance",
+        "it services",
+        "logistics",
+        "hr services",
+        "miscellaneous",
+      ],
       required: true,
     },
     notes: String,
@@ -44,7 +55,14 @@ const invoiceSchema = new mongoose.Schema(
       {
         action: {
           type: String,
-          enum: ["submitted", "approved", "rejected", "reassigned", "paid"],
+          enum: [
+            "submitted",
+            "approved",
+            "rejected",
+            "reassigned",
+            "paid",
+            "assigned",
+          ],
         },
         user: {
           type: mongoose.Schema.Types.ObjectId,
@@ -86,9 +104,21 @@ export const invoiceValidationSchema = Joi.object({
 
   category: Joi.string()
     .valid(
-      "utilities", "software", "office supplies", "travel", "consulting",
-      "marketing", "maintenance", "training", "legal", "subscription",
-      "insurance", "it services", "logistics", "hr services", "miscellaneous"
+      "utilities",
+      "software",
+      "office supplies",
+      "travel",
+      "consulting",
+      "marketing",
+      "maintenance",
+      "training",
+      "legal",
+      "subscription",
+      "insurance",
+      "it services",
+      "logistics",
+      "hr services",
+      "miscellaneous"
     )
     .lowercase()
     .required()
