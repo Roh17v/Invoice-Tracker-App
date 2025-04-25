@@ -249,7 +249,7 @@ const MyInvoices = () => {
     }
     handleInvoiceAction(invoiceId, "reassigned", {
       assignedTo: newAssignee[invoiceId],
-      note: actionNote.trim() || `Reassigned to user ${newAssignee[invoiceId]}`,
+      note: actionNote.trim(),
     });
   };
 
