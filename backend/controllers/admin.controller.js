@@ -5,13 +5,39 @@ import { createError } from "../utils/error.js";
 export const createInvoiceAdmin = async (req, res, next) => {
   try {
     const { error } = invoiceValidationSchema.validate(req.body);
-    if (error) return next(createError(400, error.details[0].message));
+    if (error) {
+      return next(createError(400, error.details[0].message));
+    }
 
     const { vendorName, amount, dueDate, category, notes, assignedTo } =
       req.body;
-
     const userId = req.user._id;
     const filePath = req.file ? req.file.path : null;
+
+    const logs = [
+      {
+        action: "submitted",
+        user: userId,
+        note: notes || "Invoice submitted.",
+      },
+    ];
+
+    let finalAssignedTo = userId;
+
+    if (assignedTo && assignedTo !== userId.toString()) {
+      const assignedUser = await User.findById(assignedTo);
+      if (!assignedUser) {
+        return next(createError(404, "Assigned user not found"));
+      }
+
+      finalAssignedTo = assignedUser._id;
+
+      logs.push({
+        action: "assigned",
+        user: userId,
+        note: `Invoice assigned to ${assignedUser.name} (${assignedUser.email})`,
+      });
+    }
 
     const invoice = new Invoice({
       vendorName,
@@ -21,19 +47,13 @@ export const createInvoiceAdmin = async (req, res, next) => {
       notes,
       filePath,
       createdBy: userId,
-      assignedTo: assignedTo || userId,
-      logs: [
-        {
-          action: "submitted",
-          user: userId,
-          note: "Invoice submitted.",
-        },
-      ],
+      assignedTo: finalAssignedTo,
+      logs,
     });
 
     const savedInvoice = await invoice.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Invoice created successfully",
       invoice: savedInvoice,
     });
@@ -96,11 +116,26 @@ export const updateInvoiceStatusAdmin = async (req, res, next) => {
     if (!invoice) return next(createError(404, "Invoice not found"));
 
     invoice.status = status;
-    invoice.assignedTo = assignedTo || invoice.assignedTo;
+
+    let logNote = note || "Status updated";
+
+    if (
+      status === "reassigned" &&
+      assignedTo &&
+      assignedTo !== invoice.assignedTo.toString()
+    ) {
+      const assignedUser = await User.findById(assignedTo).select("name email");
+      if (!assignedUser)
+        return next(createError(404, "Assigned user not found"));
+
+      invoice.assignedTo = assignedUser._id;
+      logNote = `Invoice reassigned to ${assignedUser.name} (${assignedUser.email})`;
+    }
+
     invoice.logs.push({
       action: status,
       user: req.user._id,
-      note: note || "Status updated",
+      note: logNote,
     });
 
     const updatedInvoice = await invoice.save();
@@ -179,7 +214,6 @@ export const getAllUsers = async (req, res, next) => {
   }
 };
 
-
 export const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -192,12 +226,12 @@ export const deleteUser = async (req, res, next) => {
 
     await Invoice.deleteMany({ $or: [{ assignedTo: id }, { createdBy: id }] });
 
-  
     await User.findByIdAndDelete(id);
 
-    return res.status(200).json({ message: "User and assigned invoices deleted successfully." });
+    return res
+      .status(200)
+      .json({ message: "User and assigned invoices deleted successfully." });
   } catch (error) {
     next(error);
   }
 };
-
