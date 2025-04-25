@@ -11,6 +11,8 @@ import { useUser } from "../context/UserContext";
 import axios from "axios";
 import { formatDistanceToNow } from "date-fns";
 import {
+  ADMIN_INVOICE_STATS_ROUTE,
+  ADMIN_RECENT_ACTIVITY_ROUTE,
   HOST,
   INVOICE_STATS_ROUTE,
   RECENT_ACTIVITY_ROUTE,
@@ -56,9 +58,13 @@ const HomePage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get(`${HOST}${INVOICE_STATS_ROUTE}`, {
-          withCredentials: true,
-        });
+        let route = `${HOST}${INVOICE_STATS_ROUTE}`;
+
+        if (user?.role === "admin") {
+          route = `${HOST}${ADMIN_INVOICE_STATS_ROUTE}`;
+        }
+
+        const response = await axios.get(route, { withCredentials: true });
         setInvoiceStats(response.data);
       } catch (err) {
         console.error(
@@ -72,9 +78,13 @@ const HomePage = () => {
 
     const fetchActivities = async () => {
       try {
-        const response = await axios.get(`${HOST}${RECENT_ACTIVITY_ROUTE}`, {
-          withCredentials: true,
-        });
+        let route = `${HOST}${RECENT_ACTIVITY_ROUTE}`;
+
+        if (user?.role === "admin") {
+          route = `${HOST}${ADMIN_RECENT_ACTIVITY_ROUTE}`;
+        }
+
+        const response = await axios.get(route, { withCredentials: true });
         setActivities(response.data);
       } catch (err) {
         console.error(
@@ -87,9 +97,11 @@ const HomePage = () => {
       }
     };
 
-    fetchStats();
-    fetchActivities();
-  }, [refreshKey]);
+    if (user) {
+      fetchStats();
+      fetchActivities();
+    }
+  }, [refreshKey, user?.role]);
 
   const statusTiles = [
     {

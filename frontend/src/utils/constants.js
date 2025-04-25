@@ -18,12 +18,16 @@ export const USER_ROUTE = `/api/users`;
 
 export const ADMIN_ROUTE = `/api/admin`;
 
-export const GET_ALL_USERS_ADMIN = `${ADMIN_ROUTE}/get-all-users`;
+export const GET_ALL_USERS_ADMIN = `${ADMIN_ROUTE}/users`;
 
 export const GET_ALL_INVOICES_ADMIN = `${ADMIN_ROUTE}/invoices`;
 
 export const UPDATE_INVOICE_STATUS = `${ADMIN_ROUTE}/invoice`;
 
-export const CREATE_NEW_USER = `${ADMIN_ROUTE}/create-user`;
+export const CREATE_NEW_USER = `${ADMIN_ROUTE}/users`;
 
 export const DELETE_USER_ROUTE = `${ADMIN_ROUTE}/users`;
+
+export const ADMIN_INVOICE_STATS_ROUTE = `${ADMIN_ROUTE}/analytics/invoices/stats`;
+
+export const ADMIN_RECENT_ACTIVITY_ROUTE = `${ADMIN_ROUTE}/analytics/invoices/activity`;

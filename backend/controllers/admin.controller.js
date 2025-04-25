@@ -235,3 +235,88 @@ export const deleteUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getInvoiceStatsAdmin = async (req, res) => {
+  try {
+    // Ensure only admins can access
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    const stats = await Invoice.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 },
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          status: "$_id",
+          count: 1,
+          totalAmount: 1,
+        },
+      },
+    ]);
+
+    const invoiceStats = {
+      pending: { count: 0, totalAmount: 0 },
+      approved: { count: 0, totalAmount: 0 },
+      rejected: { count: 0, totalAmount: 0 },
+      paid: { count: 0, totalAmount: 0 },
+    };
+
+    stats.forEach(({ status, count, totalAmount }) => {
+      invoiceStats[status] = { count, totalAmount };
+    });
+
+    res.status(200).json(invoiceStats);
+  } catch (error) {
+    console.error("Error fetching invoice stats:", error);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching invoice stats." });
+  }
+};
+
+export const getRecentActivityAdmin = async (req, res) => {
+  try {
+    // Ensure only admin can access
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    const invoices = await Invoice.find({})
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate("logs.user", "name email")
+      .lean();
+
+    const activities = invoices
+      .flatMap((invoice) =>
+        invoice.logs.map((log) => ({
+          action: log.action,
+          invoiceId: invoice._id,
+          vendorName: invoice.vendorName,
+          amount: invoice.amount,
+          status: invoice.status,
+          timestamp: log.timestamp,
+          userName: log.user?.name || "Unknown",
+          userEmail: log.user?.email || "Unknown",
+          note: log.note || "",
+          createdBy: invoice.createdBy?.name || "Unknown",
+          assignedTo: invoice.assignedTo?.name || "Unknown",
+        }))
+      )
+      .sort((a, b) => b.timestamp - a.timestamp) // Sort by timestamp (newest first)
+      .slice(0, 10); // Limit to 10 most recent activities
+
+    res.status(200).json(activities);
+  } catch (error) {
+    console.error("Error fetching recent activity:", error);
+    res.status(500).json({ message: "Server error while fetching activity." });
+  }
+};
+

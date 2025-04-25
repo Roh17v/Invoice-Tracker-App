@@ -8,38 +8,28 @@ import {
   getAllUsers,
   getInvoiceByIdAdmin,
   getInvoicesByUserAdmin,
+  getInvoiceStatsAdmin,
+  getRecentActivityAdmin,
   updateInvoiceStatusAdmin,
 } from "../controllers/admin.controller.js";
 import upload from "../utils/multerconfig.js";
 
 const adminRouter = Router();
 
-// Create an invoice (Admin)
-adminRouter.post(
-  "/invoices",
-  isAdmin,
-  upload.single("file"),
-  createInvoiceAdmin
-);
+adminRouter.get("/users", isAdmin, getAllUsers); // Get all users
+adminRouter.post("/users", isAdmin, createUser); // Create a new user
+adminRouter.delete("/users/:id", isAdmin, deleteUser); // Delete user by ID
 
-// Get all invoices (Admin only)
-adminRouter.get("/invoices", isAdmin, getAllInvoicesAdmin);
+// Invoice Management Routes
+adminRouter.post("/invoices", isAdmin, upload.single("file"), createInvoiceAdmin); // Create invoice with file upload
+adminRouter.get("/invoices", isAdmin, getAllInvoicesAdmin); // Get all invoices
+adminRouter.get("/invoices/:id", isAdmin, getInvoiceByIdAdmin); // Get invoice by ID
+adminRouter.put("/invoices/:id/status", isAdmin, updateInvoiceStatusAdmin); // Update invoice status by ID
+adminRouter.get("/invoices/user/:userId", isAdmin, getInvoicesByUserAdmin); // Get invoices by user ID
 
-adminRouter.get("/get-all-users", isAdmin, getAllUsers);
+// Analytics and Activity Routes
+adminRouter.get("/analytics/invoices/stats", isAdmin, getInvoiceStatsAdmin); // Get invoice statistics
+adminRouter.get("/analytics/invoices/activity", isAdmin, getRecentActivityAdmin);
 
-// Get invoice by ID (Admin only)
-adminRouter.get("/invoices/:id", isAdmin, getInvoiceByIdAdmin);
-
-// Update invoice status (Approve/Reject/Reassign/paid) (Admin only)
-adminRouter.put("/invoices/:id/status", isAdmin, updateInvoiceStatusAdmin);
-
-// Get invoices created or assigned to a specific user (Admin only)
-adminRouter.get("/invoices/user/:userId", isAdmin, getInvoicesByUserAdmin);
-
-//create new user
-adminRouter.post("/create-user", isAdmin, createUser);
-
-//delete a user
-adminRouter.delete("/users/:id", isAdmin, deleteUser);
 
 export default adminRouter;
